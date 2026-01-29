@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐱 猫咪审判庭 - 好猫坏猫大鉴定 ⚖️</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #FF6B9D;
+            --secondary: #C44569;
+            --accent: #F8B500;
+            --good: #00D9A5;
+            --bad: #FF4757;
+            --mystery: #A29BFE;
+        }
+
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%);
+            background-size: 400% 400%;
+            min-height: 100vh;
+            padding: 20px;
+            animation: rainbowBg 15s ease infinite;
+            overflow-x: hidden;
+        }
+
+        @keyframes rainbowBg {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        /* 漂浮装饰元素 */
+        .floating-item {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.6;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-30px) rotate(10deg);
+            }
+        }
+
+        .floating-item:nth-child(1) {
+            top: 10%;
+            left: 5%;
+            font-size: 2em;
+            animation-delay: 0s;
+        }
+
+        .floating-item:nth-child(2) {
+            top: 20%;
+            right: 8%;
+            font-size: 2.5em;
+            animation-delay: 1s;
+        }
+
+        .floating-item:nth-child(3) {
+            top: 60%;
+            left: 3%;
+            font-size: 1.8em;
+            animation-delay: 2s;
+        }
+
+        .floating-item:nth-child(4) {
+            bottom: 20%;
+            right: 5%;
+            font-size: 2.2em;
+            animation-delay: 3s;
+        }
+
+        .floating-item:nth-child(5) {
+            top: 40%;
+            left: 8%;
+            font-size: 1.5em;
+            animation-delay: 4s;
+        }
+
+        .floating-item:nth-child(6) {
+            bottom: 30%;
+            left: 10%;
+            font-size: 2em;
+            animation-delay: 5s;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 标题区域 */
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.3), transparent 30%);
+            animation: shine 4s linear infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 3.5em;
+            background: linear-gradient(45deg, #FF6B9D, #C44569, #F8B500, #00D9A5, #A29BFE);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease infinite;
+            margin-bottom: 15px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        @keyframes gradientShift {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            33% {
+                background-position: 100% 50%;
+            }
+
+            66% {
+                background-position: 50% 100%;
+            }
+        }
+
+        .header-subtitle {
+            color: #666;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .header-subtitle span {
+            animation: wiggle 2s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .cat-count {
+            display: inline-block;
+            background: linear-gradient(45deg, #FF6B9D, #C44569);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            margin-top: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* 主卡片 */
+        .main-card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 30px;
+            padding: 35px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* 上传区域 */
+        .upload-section {
+            text-align: center;
+            padding: 50px 30px;
+            border: 4px dashed;
+            border-image: linear-gradient(45deg, #FF6B9D, #C44569, #F8B500, #00D9A5) 1;
+            border-radius: 25px;
+            margin-bottom: 25px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-section:hover {
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.2);
+        }
+
+        .upload-section.dragover {
+            border-color: #00D9A5;
+            background: rgba(0, 217, 165, 0.1);
+            transform: scale(1.05);
+        }
+
+        .upload-mascot {
+            font-size: 6em;
+            margin-bottom: 20px;
+            animation: mascotBounce 1s ease infinite;
+            display: inline-block;
+        }
+
+        @keyframes mascotBounce {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.1);
+            }
+        }
+
+        .upload-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .upload-hint {
+            color: #999;
+            margin: 15px 0;
+            font-size: 1.1em;
+        }
+
+        .upload-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .upload-btn,
+        .camera-btn {
+            padding: 18px 45px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-btn {
+            background: linear-gradient(45deg, #FF6B9D, #C44569);
+            color: white;
+        }
+
+        .camera-btn {
+            background: linear-gradient(45deg, #00D9A5, #00B894);
+            color: white;
+        }
+
+        .upload-btn:hover,
+        .camera-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .upload-btn:active,
+        .camera-btn:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* 摄像头区域 */
+        .camera-section {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .camera-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .camera-wrapper {
+            position: relative;
+            display: inline-block;
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            background: #000;
+            max-width: 100%;
+        }
+
+        .camera-frame {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 4px dashed rgba(255, 255, 255, 0.8);
+            border-radius: 20px;
+            pointer-events: none;
+            animation: framePulse 2s infinite;
+        }
+
+        @keyframes framePulse {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        #video {
+            width: 100%;
+            max-width: 500px;
+            display: block;
+            min-height: 300px;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .camera-controls {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .capture-btn {
+            padding: 18px 50px;
+            background: linear-gradient(45deg, #FF4757, #FF6B9D);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: capturePulse 1.5s infinite;
+        }
+
+        @keyframes capturePulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 15px rgba(255, 71, 87, 0);
+            }
+        }
+
+        .capture-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 预览区域 */
+        .preview-section {
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .preview-section.active {
+            display: block;
+        }
+
+        .preview-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            animation: photoAppear 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes photoAppear {
+            0% {
+                transform: scale(0) rotate(-10deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+        }
+
+        .photo-stickers {
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 3em;
+            animation: stickerPop 0.5s ease 0.3s both;
+        }
+
+        @keyframes stickerPop {
+            0% {
+                transform: scale(0);
+            }
+
+            80% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* 分析按钮 */
+        .analyze-btn {
+            display: none;
+            width: 100%;
+            max-width: 400px;
+            margin: 30px auto;
+            padding: 22px 60px;
+            background: linear-gradient(45deg, #f093fb, #f5576c, #FF6B9D);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.4em;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: analyzeGlow 2s ease infinite;
+            font-family: 'ZCOOL KuaiLe', cursive;
+            letter-spacing: 2px;
+        }
+
+        .analyze-btn.active {
+            display: block;
+        }
+
+        @keyframes analyzeGlow {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+                box-shadow: 0 10px 30px rgba(240, 147, 251, 0.5);
+            }
+
+            50% {
+                background-position: 100% 50%;
+                box-shadow: 0 15px 40px rgba(245, 87, 108, 0.6);
+            }
+        }
+
+        .analyze-btn:hover {
+            transform: scale(1.08) translateY(-3px);
+        }
+
+        /* 加载区域 */
+        .loading-section {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-section.active {
+            display: block;
+        }
+
+        .cat-judge {
+            position: relative;
+            display: inline-block;
+        }
+
+        .cat-emoji {
+            font-size: 6em;
+            animation: judgeBounce 0.6s ease infinite;
+            display: inline-block;
+        }
+
+        @keyframes judgeBounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-25px);
+            }
+        }
+
+        .gavel {
+            position: absolute;
+            top: -20px;
+            right: -40px;
+            font-size: 3em;
+            animation: gavelHit 0.6s ease infinite;
+            transform-origin: bottom left;
+        }
+
+        @keyframes gavelHit {
+
+            0%,
+            100% {
+                transform: rotate(-20deg);
+            }
+
+            50% {
+                transform: rotate(10deg);
+            }
+        }
+
+        .loading-text {
+            margin-top: 30px;
+            font-size: 1.4em;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .loading-tips {
+            margin-top: 15px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #fff5f5, #fff9e6);
+            border-radius: 15px;
+            display: inline-block;
+            animation: tipChange 0.5s ease;
+        }
+
+        @keyframes tipChange {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-tips .emoji {
+            font-size: 1.5em;
+            margin-right: 8px;
+        }
+
+        .progress-bar {
+            width: 80%;
+            max-width: 400px;
+            height: 20px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin: 25px auto;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B9D, #C44569, #F8B500, #00D9A5);
+            background-size: 300% 100%;
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+            animation: progressShine 2s linear infinite;
+        }
+
+        @keyframes progressShine {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            100% {
+                background-position: 300% 50%;
+            }
+        }
+
+        /* 结果区域 */
+        .result-section {
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+            animation: resultAppear 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes resultAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) translateY(50px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .verdict-header {
+            text-align: center;
+            padding: 40px 30px;
+            border-radius: 25px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: verdictPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes verdictPop {
+            0% {
+                transform: scale(0) rotate(-10deg);
+            }
+
+            70% {
+                transform: scale(1.1) rotate(5deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .verdict-header.good-cat {
+            background: linear-gradient(135deg, #00D9A5, #00B894, #00CEC9);
+        }
+
+        .verdict-header.bad-cat {
+            background: linear-gradient(135deg, #FF4757, #FF6B9D, #C44569);
+        }
+
+        .verdict-header.mystery-cat {
+            background: linear-gradient(135deg, #A29BFE, #6C5CE7, #74B9FF);
+        }
+
+        .verdict-header.social-cat {
+            background: linear-gradient(135deg, #FF9FF3, #F368E0, #FF6B9D);
+        }
+
+        .verdict-header.lazy-cat {
+            background: linear-gradient(135deg, #FFEAA7, #FAB1A0, #F093FB);
+        }
+
+        .verdict-header.wild-cat {
+            background: linear-gradient(135deg, #FF6B6B, #EE5253, #576574);
+        }
+
+        .verdict-header.thinker-cat {
+            background: linear-gradient(135deg, #48DBFB, #0ABDE3, #2E86DE);
+        }
+
+        .verdict-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.3), transparent 30%);
+            animation: shine 4s linear infinite;
+        }
+
+        .verdict-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .verdict-emoji {
+            font-size: 6em;
+            margin-bottom: 15px;
+            animation: emojiCelebrate 1s ease infinite;
+            display: inline-block;
+        }
+
+        @keyframes emojiCelebrate {
+
+            0%,
+            100% {
+                transform: scale(1) rotate(-5deg);
+            }
+
+            50% {
+                transform: scale(1.2) rotate(5deg);
+            }
+        }
+
+        .verdict-title {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 3em;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        .verdict-subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 1.3em;
+        }
+
+        /* 评分区域 */
+        .score-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .score-card {
+            background: linear-gradient(135deg, #f8f9fa, #fff);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #FF6B9D, #C44569, #F8B500);
+        }
+
+        .score-icon {
+            font-size: 3em;
+            margin-bottom: 12px;
+            animation: iconWiggle 2s ease infinite;
+        }
+
+        @keyframes iconWiggle {
+
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+
+        .score-name {
+            font-weight: 900;
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .score-bar-container {
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        .score-bar {
+            height: 25px;
+            background: #e8e8e8;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .score-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent);
+            border-radius: 15px 15px 0 0;
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 15px;
+            transition: width 1.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: barShine 2s infinite;
+        }
+
+        @keyframes barShine {
+            0% {
+                left: -100%;
+            }
+
+            100% {
+                left: 100%;
+            }
+        }
+
+        .score-fill.high {
+            background: linear-gradient(90deg, #00D9A5, #00B894);
+        }
+
+        .score-fill.medium {
+            background: linear-gradient(90deg, #F8B500, #FFA502);
+        }
+
+        .score-fill.low {
+            background: linear-gradient(90deg, #FF4757, #FF6B9D);
+        }
+
+        .score-value {
+            font-size: 1.4em;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .score-desc {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* 犯罪证据 */
+        .crime-evidence {
+            background: linear-gradient(135deg, #fff5f5, #ffe0e0);
+            border: 3px solid #FF4757;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            animation: evidenceShake 0.5s ease;
+        }
+
+        @keyframes evidenceShake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-10px);
+            }
+
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .crime-evidence h3 {
+            color: #FF4757;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.4em;
+            font-family: 'ZCOOL KuaiLe', cursive;
+        }
+
+        .evidence-list {
+            list-style: none;
+        }
+
+        .evidence-list li {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: evidenceItem 0.5s ease both;
+            border-left: 4px solid #FF4757;
+            transition: all 0.3s ease;
+        }
+
+        .evidence-list li:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(255, 71, 87, 0.2);
+        }
+
+        .evidence-list li:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .evidence-list li:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .evidence-list li:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .evidence-list li:nth-child(4) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes evidenceItem {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* 判决书 */
+        .final-sentence {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 25px;
+            padding: 35px;
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .final-sentence::before {
+            content: '📜';
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 3em;
+            opacity: 0.3;
+            animation: scrollFloat 3s ease infinite;
+        }
+
+        @keyframes scrollFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+        }
+
+        .final-sentence h3 {
+            font-family: 'ZCOOL KuaiLe', cursive;
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .sentence-text {
+            font-size: 1.3em;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* 标签 */
+        .cat-tags {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .cat-tag {
+            padding: 12px 25px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            animation: tagPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) both;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .cat-tag:hover {
+            transform: scale(1.15) rotate(5deg);
+        }
+
+        .cat-tag:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .cat-tag:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .cat-tag:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes tagPop {
+            0% {
+                opacity: 0;
+                transform: scale(0);
+            }
+
+            70% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .cat-tag.good {
+            background: linear-gradient(135deg, #00D9A5, #00B894);
+            color: white;
+        }
+
+        .cat-tag.bad {
+            background: linear-gradient(135deg, #FF4757, #FF6B9D);
+            color: white;
+        }
+
+        .cat-tag.neutral {
+            background: linear-gradient(135deg, #A29BFE, #6C5CE7);
+            color: white;
+        }
+
+        /* 小知识 */
+        .fun-fact {
+            background: linear-gradient(135deg, #fff9e6, #fff5d6);
+            border-left: 5px solid #F8B500;
+            padding: 25px;
+            border-radius: 0 20px 20px 0;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .fun-fact::before {
+            content: '💡';
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            font-size: 2em;
+            background: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .fun-fact h4 {
+            color: #e67e22;
+            margin-bottom: 15px;
+            margin-left: 40px;
+            font-size: 1.2em;
+        }
+
+        .fun-fact p {
+            color: #666;
+            line-height: 1.7;
+        }
+
+        /* 重新开始按钮 */
+        .restart-btn {
+            display: block;
+            width: 100%;
+            padding: 22px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            background-size: 200% 200%;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.3em;
+            font-weight: 900;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            font-family: 'ZCOOL KuaiLe', cursive;
+            letter-spacing: 2px;
+            animation: restartGlow 3s ease infinite;
+        }
+
+        @keyframes restartGlow {
+
+            0%,
+            100% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        /* 彩蛋按钮 */
+        .easter-egg {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #FF6B9D, #C44569);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            z-index: 100;
+            border: none;
+        }
+
+        .easter-egg:hover {
+            transform: scale(1.2) rotate(15deg);
+        }
+
+        /* 彩蛋弹窗 */
+        .egg-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .egg-modal.active {
+            display: flex;
+        }
+
+        .egg-content {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            max-width: 400px;
+            animation: eggPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes eggPop {
+            0% {
+                transform: scale(0) rotate(-20deg);
+            }
+
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        .egg-emoji {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .egg-text {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .egg-close {
+            padding: 15px 40px;
+            background: linear-gradient(45deg, #FF6B9D, #C44569);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        /* 点击特效 */
+        .click-effect {
+            position: fixed;
+            pointer-events: none;
+            font-size: 2em;
+            animation: clickPop 0.8s ease forwards;
+            z-index: 9999;
+        }
+
+        @keyframes clickPop {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式 */
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 2.2em;
+            }
+
+            .upload-buttons {
+                flex-direction: column;
+            }
+
+            .upload-btn,
+            .camera-btn {
+                width: 100%;
+            }
+
+            .verdict-title {
+                font-size: 2em;
+            }
+
+            .score-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 音效开关 */
+        .sound-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .sound-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-toggle.muted {
+            opacity: 0.6;
+        }
+
+        /* 摄像头错误提示 */
+        .camera-error {
+            background: #fff5f5;
+            border: 2px solid #FF4757;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #FF4757;
+        }
+
+        .camera-error h4 {
+            margin-bottom: 10px;
+        }
+
+        .camera-error ul {
+            margin-left: 20px;
+            text-align: left;
+        }
+
+        .camera-error li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 漂浮装饰 -->
+    <div class="floating-item">🐾</div>
+    <div class="floating-item">🐟</div>
+    <div class="floating-item">🧶</div>
+    <div class="floating-item">💕</div>
+    <div class="floating-item">🎀</div>
+    <div class="floating-item">🥫</div>
+
+    <!-- 音效开关 -->
+    <button class="sound-toggle" id="soundToggle" onclick="toggleSound()">🔊</button>
+
+    <div class="container">
+        <!-- 标题区域 -->
+        <div class="header">
+            <div class="header-content">
+                <h1>🐱 猫咪审判庭 ⚖️</h1>
+                <p class="header-subtitle">
+                    <span>AI法官</span>在线审判：<span>你的猫</span>是<span>好猫咪</span>还是<span>坏猫</span>？
+                </p>
+                <div class="cat-count">🐾 已审判猫咪：<span id="judgedCount">0</span> 只</div>
+            </div>
+        </div>
+
+        <!-- 主卡片 -->
+        <div class="main-card">
+            <!-- 上传区域 -->
+            <div class="upload-section" id="uploadSection">
+                <div class="upload-mascot">😼</div>
+                <h2 class="upload-title">上传猫咪罪证照片</h2>
+                <p class="upload-hint">📸 支持拖拽上传，或使用摄像头现场抓捕</p>
+                <div class="upload-buttons">
+                    <label for="fileInput" class="upload-btn">📁 选择照片</label>
+                    <button class="camera-btn" onclick="startCamera()">📷 打开摄像头</button>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" onchange="handleFileSelect(event)">
+            </div>
+
+            <!-- 摄像头区域 -->
+            <div class="camera-section" id="cameraSection">
+                <div class="camera-wrapper">
+                    <video id="video" autoplay playsinline muted></video>
+                    <div class="camera-frame"></div>
+                </div>
+                <canvas id="canvas"></canvas>
+                <div class="camera-controls">
+                    <button class="capture-btn" onclick="capturePhoto()">📸 拍照抓捕</button>
+                    <button class="upload-btn" onclick="stopCamera()">❌ 关闭摄像头</button>
+                </div>
+                <div id="cameraError" class="camera-error" style="display: none;"></div>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="preview-section" id="previewSection">
+                <div class="preview-wrapper">
+                    <img id="previewImage" class="preview-image" alt="猫咪照片">
+                    <div class="photo-stickers">📸</div>
+                </div>
+            </div>
+
+            <!-- 分析按钮 -->
+            <button class="analyze-btn" id="analyzeBtn" onclick="analyzeCat()">🔍 开始审判！</button>
+
+            <!-- 加载区域 -->
+            <div class="loading-section" id="loadingSection">
+                <div class="cat-judge">
+                    <span class="cat-emoji">👨‍⚖️</span>
+                    <span class="gavel">🔨</span>
+                </div>
+                <p class="loading-text">AI法官正在仔细审查罪证...</p>
+                <div class="loading-tips">
+                    <span class="emoji" id="loadingEmoji">🔍</span>
+                    <span id="loadingTip">调取监控录像中...</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- 结果区域 -->
+            <div class="result-section" id="resultSection">
+                <div class="verdict-header" id="verdictHeader">
+                    <div class="verdict-content">
+                        <div class="verdict-emoji" id="verdictEmoji">🐱</div>
+                        <h2 class="verdict-title" id="verdictTitle">审判结果</h2>
+                        <p class="verdict-subtitle" id="verdictSubtitle">...</p>
+                    </div>
+                </div>
+
+                <div class="score-section" id="scoreSection">
+                    <!-- 动态生成评分卡片 -->
+                </div>
+
+                <div class="crime-evidence" id="crimeEvidence" style="display: none;">
+                    <h3>🚨 犯罪证据清单</h3>
+                    <ul class="evidence-list" id="evidenceList">
+                        <!-- 动态生成 -->
+                    </ul>
+                </div>
+
+                <div class="final-sentence">
+                    <h3>📜 判决书</h3>
+                    <p class="sentence-text" id="sentenceText">...</p>
+                </div>
+
+                <div class="cat-tags" id="catTags">
+                    <!-- 动态生成标签 -->
+                </div>
+
+                <div class="fun-fact">
+                    <h4>猫奴小知识</h4>
+                    <p id="funFactText">...</p>
+                </div>
+
+                <button class="restart-btn" onclick="restart()">🔄 审判下一只猫咪</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 彩蛋按钮 -->
+    <button class="easter-egg" onclick="showEasterEgg()" title="点击有惊喜！">🎁</button>
+
+    <!-- 彩蛋弹窗 -->
+    <div class="egg-modal" id="eggModal" onclick="hideEasterEgg(event)">
+        <div class="egg-content" onclick="event.stopPropagation()">
+            <div class="egg-emoji">🐱</div>
+            <p class="egg-text" id="eggText">其实所有猫咪都是好猫咪！<br>坏猫只是人类的一厢情愿~</p>
+            <button class="egg-close" onclick="hideEasterEgg()">知道了喵~</button>
+        </div>
+    </div>
+
+    <script>
+        let currentImage = null;
+        let stream = null;
+        let soundEnabled = true;
+        let audioContext = null;
+        let judgedCount = parseInt(localStorage.getItem('judgedCount') || '0');
+
+        // 更新已审判数量
+        document.getElementById('judgedCount').textContent = judgedCount;
+
+        // 初始化音频上下文
+        function initAudio() {
+            if (!audioContext) {
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('音频初始化失败:', e);
+                }
+            }
+        }
+
+        // 播放喵声 - 使用 Web Audio API 生成
+        function playMeow() {
+            if (!soundEnabled || !audioContext) return;
+
+            try {
+                // 恢复音频上下文（解决浏览器自动播放策略）
+                if (audioContext.state === 'suspended') {
+                    audioContext.resume();
+                }
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                // 创建喵声效果
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                // 设置频率变化模拟喵声
+                const now = audioContext.currentTime;
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(600, now);
+                oscillator.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                oscillator.frequency.exponentialRampToValueAtTime(500, now + 0.2);
+                oscillator.frequency.exponentialRampToValueAtTime(300, now + 0.4);
+
+                // 设置音量包络
+                gainNode.gain.setValueAtTime(0, now);
+                gainNode.gain.linearRampToValueAtTime(0.3, now + 0.05);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+
+                oscillator.start(now);
+                oscillator.stop(now + 0.5);
+            } catch (e) {
+                console.log('播放音效失败:', e);
+            }
+        }
+
+        // 音效开关
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundToggle');
+            btn.textContent = soundEnabled ? '🔊' : '🔇';
+            btn.classList.toggle('muted', !soundEnabled);
+
+            // 初始化音频上下文
+            if (soundEnabled) {
+                initAudio();
+            }
+        }
+
+        // 点击特效
+        document.addEventListener('click', (e) => {
+            // 初始化音频（用户交互后）
+            initAudio();
+
+            const effects = ['🐾', '💕', '🐟', '🧶', '🎀', '⭐'];
+            const effect = document.createElement('div');
+            effect.className = 'click-effect';
+            effect.textContent = effects[Math.floor(Math.random() * effects.length)];
+            effect.style.left = e.clientX + 'px';
+            effect.style.top = e.clientY + 'px';
+            document.body.appendChild(effect);
+            setTimeout(() => effect.remove(), 800);
+        });
+
+        // 拖拽上传
+        const uploadSection = document.getElementById('uploadSection');
+
+        uploadSection.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadSection.classList.add('dragover');
+        });
+
+        uploadSection.addEventListener('dragleave', () => {
+            uploadSection.classList.remove('dragover');
+        });
+
+        uploadSection.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadSection.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                handleFile(file);
+            }
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                alert('请上传图片文件！🐱');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentImage = e.target.result;
+                showPreview(currentImage);
+                playMeow();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // 显示摄像头错误
+        function showCameraError(message, details) {
+            const errorDiv = document.getElementById('cameraError');
+            errorDiv.innerHTML = `
+                <h4>📷 ${message}</h4>
+                <ul>
+                    ${details.map(d => `<li>${d}</li>`).join('')}
+                </ul>
+            `;
+            errorDiv.style.display = 'block';
+        }
+
+        // 隐藏摄像头错误
+        function hideCameraError() {
+            document.getElementById('cameraError').style.display = 'none';
+        }
+
+        async function startCamera() {
+            hideCameraError();
+
+            try {
+                // 首先尝试最简单的约束
+                const constraints = { video: true };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+
+                // 等待视频加载
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = () => {
+                        resolve();
+                    };
+                });
+
+                document.getElementById('uploadSection').style.display = 'none';
+                document.getElementById('cameraSection').classList.add('active');
+                playMeow();
+            } catch (err) {
+                console.error('摄像头错误:', err);
+
+                let errorMessage = '无法访问摄像头';
+                let errorDetails = [];
+
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    errorMessage = '摄像头权限被拒绝';
+                    errorDetails = [
+                        '请在浏览器地址栏点击摄像头图标，允许访问',
+                        '检查系统设置中的摄像头权限',
+                        '刷新页面后重试'
+                    ];
+                } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+                    errorMessage = '未找到摄像头设备';
+                    errorDetails = [
+                        '请确保您的设备有摄像头',
+                        '检查摄像头是否正确连接',
+                        '尝试使用上传照片功能'
+                    ];
+                } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+                    errorMessage = '摄像头被其他应用占用';
+                    errorDetails = [
+                        '请关闭其他使用摄像头的应用',
+                        '刷新页面后重试',
+                        '尝试使用上传照片功能'
+                    ];
+                } else {
+                    errorMessage = '无法访问摄像头';
+                    errorDetails = [
+                        '错误信息: ' + err.message,
+                        '请检查浏览器权限设置',
+                        '尝试使用上传照片功能'
+                    ];
+                }
+
+                showCameraError(errorMessage, errorDetails);
+
+                // 仍然显示摄像头界面，但显示错误信息
+                document.getElementById('uploadSection').style.display = 'none';
+                document.getElementById('cameraSection').classList.add('active');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            hideCameraError();
+            document.getElementById('cameraSection').classList.remove('active');
+            document.getElementById('uploadSection').style.display = 'block';
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+
+            // 检查视频是否已加载
+            if (!video.videoWidth || !video.videoHeight) {
+                alert('摄像头尚未准备好，请稍后再试 📷');
+                return;
+            }
+
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            currentImage = canvas.toDataURL('image/jpeg', 0.9);
+            showPreview(currentImage);
+            stopCamera();
+            playMeow();
+        }
+
+        function showPreview(imageSrc) {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('cameraSection').classList.remove('active');
+            document.getElementById('previewSection').classList.add('active');
+            document.getElementById('previewImage').src = imageSrc;
+            document.getElementById('analyzeBtn').classList.add('active');
+        }
+
+        // 评判维度
+        const dimensions = [
+            { id: 'destruction', name: '破坏指数', icon: '🛋️', desc: '抓沙发、打翻水杯的能力' },
+            { id: 'innocence', name: '无辜指数', icon: '🥺', desc: '眼神有多无辜' },
+            { id: 'rebellion', name: '叛逆指数', icon: '😈', desc: '是否听人类的话' },
+            { id: 'nightActivity', name: '夜猫子指数', icon: '🌙', desc: '夜间跑酷频率' },
+            { id: 'attitude', name: '对人类态度', icon: '🤔', desc: '高冷vs舔狗' },
+            { id: 'foodTheft', name: '偷食指数', icon: '🍗', desc: '偷吃人类食物的能力' }
+        ];
+
+        // 犯罪证据库
+        const crimes = [
+            '凌晨3点在家跑酷，制造噪音污染 🏃',
+            '故意打翻桌上的水杯，测试重力 💧',
+            '在沙发上磨爪子，留下犯罪痕迹 🛋️',
+            '偷吃人类的食物，罪证确凿 🍗',
+            '把东西推下桌子，假装无辜 📦',
+            '在不该睡的地方睡觉，占领人类领地 🛏️',
+            '对人类的呼唤充耳不闻，态度恶劣 🙉',
+            '在猫砂盆外面便便，挑战权威 💩',
+            '咬坏充电线，造成经济损失 🔌',
+            '把猫毛沾满人类的衣服，标记所有权 👔',
+            '在人类工作时趴在键盘上，干扰办公 ⌨️',
+            '开门后突然停在门口，制造交通堵塞 🚪'
+        ];
+
+        // 判决书模板
+        const sentences = {
+            goodCat: [
+                '经本庭审理，被告猫行为端正，态度良好，判定为【好猫咪】。建议主人多给罐头奖励，继续保持！🏆',
+                '被告猫表现优异，几乎没有任何不良记录，是猫界的模范生。判决：授予【好猫咪】称号！🌟',
+                '本庭惊讶地发现，这是一只罕见的乖巧猫咪。判决：【好猫咪】，建议申请吉尼斯纪录！📜',
+                '被告猫简直是天使下凡！判决：【好猫咪】，这样的猫请给我来一打！😇'
+            ],
+            badCat: [
+                '经本庭审理，被告猫罪行累累，证据确凿，判定为【坏猫】。建议立即进行爱的教育！⚠️',
+                '被告猫的行为已经严重触犯了猫界法律，是一只典型的【坏猫】。判决：没收当晚的罐头！🚫',
+                '本庭从未见过如此嚣张的猫咪！判决：【坏猫】无疑，建议主人考虑养第二只来制衡！😈',
+                '被告猫的犯罪记录可以写一本书了！判决：【坏猫】，建议送去猫咪改造学校！📚'
+            ],
+            mysteryCat: [
+                '被告猫的行为令人捉摸不透，有时乖巧有时调皮，判定为【薛定谔的猫】。建议继续观察！🔮',
+                '这是一只充满矛盾的猫咪，好坏参半，本庭难以判决。暂定为【神秘猫】！🎭',
+                '被告猫的表现忽好忽坏，可能是一只会演戏的猫。判决：【戏精猫】，建议颁发奥斯卡！🏆',
+                '本庭怀疑这只猫有双重猫格！判决：【神秘猫】，需要进一步调查！🕵️'
+            ],
+            socialCat: [
+                '检测到极高的社交能量，这只猫简直是人类的好伴侣！判决：【社牛达猫】，建议带它去结识更多朋友！🤝',
+                '它对人类的喜爱已经溢出屏幕了。判决：【社牛达猫】，恭喜你获得了一个粘人精！💖',
+                '这是一只社交天花板，它甚至想跟审判员击掌！判决：【社牛达猫】！🥳'
+            ],
+            lazyCat: [
+                '被告猫的运动量已经低破本庭记录！判决：【猪猪猫】，快带它去运动！🐖',
+                '它已经不是一只猫了，而是一块会打呼噜的毛绒枕头。判决：【猪猪猫】！🛌',
+                '除了一日三餐，它对世界毫无兴趣。判决：【猪猪猫】，建议减少罐头供应。🍩'
+            ],
+            wildCat: [
+                '被告猫体内封印着哈士奇的灵魂，拆迁能力满分！判决：【荒野猎手】，请加固您的窗帘和天花板！⚡',
+                '这是一只运动细胞过剩的野性猫咪，家里已经放不下它了。判决：【荒野猎手】！🏃',
+                '它不是在跑酷，就是在准备跑道。判决：【荒野猎手】，祝你的家具好运！💥'
+            ],
+            thinkerCat: [
+                '它正在思考宇宙的终极奥义，或者是墙上那颗并不存在的尘埃。判决：【猫中哲学家】。🤔',
+                '静止是为了更有力地审视这个世界。判决：【猫中哲学家】，它可能已经看穿了你。👁️',
+                '这是一位禅修大师，发呆是它的主要技能。判决：【猫中哲学家】！🔯'
+            ]
+        };
+
+        // 猫标签
+        const catTags = {
+            good: ['天使宝宝 👼', '粘人精 💕', '乖巧懂事 🌟', '人类好朋友 🤝', '罐头守护者 🥫'],
+            bad: ['沙发杀手 🛋️', '水杯猎人 💧', '夜行侠 🌙', '叛逆少年 😎', '破坏王 💥'],
+            neutral: ['戏精本精 🎭', '双面间谍 🕵️', '神秘莫测 🔮', '难以捉摸 ❓', '猫界影帝 🏆'],
+            social: ['社交达人 🤝', '派对之王 🥳', '粘人精 💕', '暖宝宝 ☀️', '社交天花板 🪜'],
+            lazy: ['液体填充 🍮', '发酵面团 🍞', '干饭第一名 🍗', '嗜睡症患者 😴', '由于太胖而无法跑酷 🐖'],
+            wild: ['拆迁办主任 🏗️', '跑酷之神 ⚡', '跳跃冠军 🏆', '野性十足 🐆', '窗帘破坏者 💥'],
+            thinker: ['发呆专家 🧘', '禅修大师 🕉️', '墙壁观察员 👁️', '灵魂伴侣 💖', '高纬度通信员 🔯']
+        };
+
+        // 猫奴小知识
+        const funFacts = [
+            '猫咪凌晨跑酷是因为它们的祖先是夜行性动物，这是刻在DNA里的！🧬',
+            '猫咪打翻东西不一定是故意的，它们只是在测试重力是否存在。🔬',
+            '猫咪抓沙发是为了标记领地，也是在磨爪子，给它们猫抓板就能拯救沙发！🛋️',
+            '猫咪对人类高冷是因为它们把人类当成大号的、不会狩猎的猫。🐱',
+            '猫咪偷吃人类食物是因为好奇，它们其实尝不出甜味！🍬',
+            '猫咪趴在键盘上是因为那里暖和，而且想引起你的注意。⌨️',
+            '猫咪在门口绊倒你是因为它们想控制你的行动路线。🚪',
+            '猫咪的尾巴竖起来表示友好，夹起来表示害怕。🐈',
+            '猫咪缓慢眨眼是对你说"我爱你"的方式！😻',
+            '猫咪的呼噜声不仅能让自己放松，还能帮助愈合伤口！💚'
+        ];
+
+        // 加载提示
+        const loadingTips = [
+            { emoji: '🔍', text: '调取监控录像中...' },
+            { emoji: '🕵️', text: '分析犯罪现场证据...' },
+            { emoji: '🐕', text: '询问目击证人（家里的狗）...' },
+            { emoji: '📚', text: '查阅猫咪犯罪档案...' },
+            { emoji: '🥺', text: '评估无辜眼神的真伪...' },
+            { emoji: '🛋️', text: '计算沙发损坏程度...' },
+            { emoji: '💧', text: '统计打翻的水杯数量...' },
+            { emoji: '⚖️', text: '即将宣判...' }
+        ];
+
+        function analyzeCat() {
+            document.getElementById('previewSection').classList.remove('active');
+            document.getElementById('analyzeBtn').classList.remove('active');
+            document.getElementById('loadingSection').classList.add('active');
+
+            // 进度条动画
+            const progressFill = document.getElementById('progressFill');
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(progressInterval);
+                }
+                progressFill.style.width = progress + '%';
+            }, 300);
+
+            // 切换提示
+            let tipIndex = 0;
+            const loadingEmoji = document.getElementById('loadingEmoji');
+            const loadingTip = document.getElementById('loadingTip');
+
+            const tipInterval = setInterval(() => {
+                const tip = loadingTips[tipIndex];
+                loadingEmoji.textContent = tip.emoji;
+                loadingTip.textContent = tip.text;
+                tipIndex = (tipIndex + 1) % loadingTips.length;
+            }, 600);
+
+            setTimeout(() => {
+                clearInterval(tipInterval);
+                clearInterval(progressInterval);
+                document.getElementById('loadingSection').classList.remove('active');
+                showResult();
+                playMeow();
+
+                // 更新审判数量
+                judgedCount++;
+                localStorage.setItem('judgedCount', judgedCount);
+                document.getElementById('judgedCount').textContent = judgedCount;
+            }, 5000);
+        }
+
+        function showResult() {
+            const resultSection = document.getElementById('resultSection');
+            resultSection.classList.add('active');
+
+            // 生成随机分数
+            const scores = {};
+            dimensions.forEach(dim => {
+                scores[dim.id] = Math.floor(Math.random() * 100) + 1;
+            });
+
+            // 计算总分和判定结果
+            const avgScore = Object.values(scores).reduce((a, b) => a + b, 0) / dimensions.length;
+
+            let verdictType, verdictEmoji, verdictTitle, verdictSubtitle;
+            // 判定逻辑
+            let resultType = 'mystery';
+            let headerClass = 'mystery-cat';
+            let emoji = '🐱';
+            let title = '神秘猫';
+            let tagsArray = catTags.neutral;
+            let sentenceList = sentences.mysteryCat;
+
+            // 新增逻辑：根据维度判定
+            if (scores.attitude >= 75 && scores.innocence >= 60) {
+                resultType = 'social';
+                headerClass = 'social-cat';
+                emoji = '💖';
+                title = '社牛达猫';
+                tagsArray = catTags.social;
+                sentenceList = sentences.socialCat;
+            } else if (scores.destruction >= 75 && scores.nightActivity >= 70) {
+                resultType = 'wild';
+                headerClass = 'wild-cat';
+                emoji = '⚡';
+                title = '荒野猎手';
+                tagsArray = catTags.wild;
+                sentenceList = sentences.wildCat;
+            } else if (avgScore <= 40 && scores.foodTheft >= 70) { // Changed avg to avgScore
+                resultType = 'lazy';
+                headerClass = 'lazy-cat';
+                emoji = '🍮';
+                title = '猪猪猫';
+                tagsArray = catTags.lazy;
+                sentenceList = sentences.lazyCat;
+            } else if (scores.attitude >= 60 && scores.nightActivity <= 30) {
+                resultType = 'thinker';
+                headerClass = 'thinker-cat';
+                emoji = '🤔';
+                title = '猫中哲学家';
+                tagsArray = catTags.thinker;
+                sentenceList = sentences.thinkerCat;
+            } else if (avgScore >= 70) { // Changed avg to avgScore
+                resultType = 'good';
+                headerClass = 'good-cat';
+                emoji = '😇';
+                title = '绝世好猫';
+                tagsArray = catTags.good;
+                sentenceList = sentences.goodCat;
+            } else if (avgScore <= 45) { // Changed avg to avgScore
+                resultType = 'bad';
+                headerClass = 'bad-cat';
+                emoji = '😈';
+                title = '法外狂猫';
+                tagsArray = catTags.bad;
+                sentenceList = sentences.badCat;
+            }
+
+            document.getElementById('verdictHeader').className = 'verdict-header ' + headerClass;
+            document.getElementById('verdictEmoji').textContent = emoji;
+            document.getElementById('verdictTitle').textContent = title;
+            document.getElementById('verdictSubtitle').textContent = `平均得分: ${Math.round(avgScore)}`; // Changed avg to avgScore
+
+            // 生成评分卡片
+            const scoreSection = document.getElementById('scoreSection');
+            scoreSection.innerHTML = '';
+            dimensions.forEach((dim, index) => {
+                const score = scores[dim.id];
+                const fillClass = score >= 70 ? 'high' : score >= 40 ? 'medium' : 'low';
+
+                const card = document.createElement('div');
+                card.className = 'score-card';
+                card.style.animationDelay = (index * 0.1) + 's';
+                card.innerHTML = `
+                    <div class="score-icon">${dim.icon}</div>
+                    <div class="score-name">${dim.name}</div>
+                    <div class="score-bar-container">
+                        <div class="score-bar">
+                            <div class="score-fill ${fillClass}" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="score-value">${score}/100</div>
+                    <div class="score-desc">${dim.desc}</div>
+                `;
+                scoreSection.appendChild(card);
+
+                // 动画填充
+                setTimeout(() => {
+                    card.querySelector('.score-fill').style.width = score + '%';
+                }, 300 + index * 100);
+            });
+
+            // 生成犯罪证据（如果是坏猫）
+            if (resultType === 'bad') {
+                const crimeEvidence = document.getElementById('crimeEvidence');
+                crimeEvidence.style.display = 'block';
+                const evidenceList = document.getElementById('evidenceList');
+                evidenceList.innerHTML = '';
+
+                const selectedCrimes = crimes.sort(() => 0.5 - Math.random()).slice(0, 4);
+                selectedCrimes.forEach(crime => {
+                    const li = document.createElement('li');
+                    li.innerHTML = crime;
+                    evidenceList.appendChild(li);
+                });
+            } else {
+                document.getElementById('crimeEvidence').style.display = 'none';
+            }
+
+            // 生成判决书
+            const sentence = sentenceList[Math.floor(Math.random() * sentenceList.length)];
+            document.getElementById('sentenceText').textContent = sentence;
+
+            // 生成标签
+            const tagsContainer = document.getElementById('catTags');
+            tagsContainer.innerHTML = '';
+            const selectedTags = tagsArray.sort(() => 0.5 - Math.random()).slice(0, 3);
+            selectedTags.forEach(tag => {
+                const span = document.createElement('span');
+                span.className = 'cat-tag ' + (resultType === 'good' ? 'good' : (resultType === 'bad' ? 'bad' : 'neutral'));
+                span.textContent = tag;
+                tagsContainer.appendChild(span);
+            });
+
+            // 生成小知识
+            document.getElementById('funFactText').textContent = funFacts[Math.floor(Math.random() * funFacts.length)];
+        }
+
+        function restart() {
+            currentImage = null;
+            document.getElementById('resultSection').classList.remove('active');
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('fileInput').value = '';
+            document.getElementById('previewImage').src = '';
+            document.getElementById('progressFill').style.width = '0%';
+            playMeow();
+        }
+
+        // 彩蛋
+        const eggTexts = [
+            '其实所有猫咪都是好猫咪！<br>坏猫只是人类的一厢情愿~ 🐱',
+            '你知道吗？猫咪统治了互联网<br>现在它们要来统治你的心！💕',
+            '如果你看到这条消息<br>说明你已经爱上猫咪了！😻',
+            '恭喜你发现彩蛋！<br>奖励你一个虚拟猫罐头！🥫',
+            '据说连续审判10只猫<br>会得到神秘奖励... 🎁'
+        ];
+
+        function showEasterEgg() {
+            const modal = document.getElementById('eggModal');
+            const text = document.getElementById('eggText');
+            text.innerHTML = eggTexts[Math.floor(Math.random() * eggTexts.length)];
+            modal.classList.add('active');
+            playMeow();
+        }
+
+        function hideEasterEgg(event) {
+            if (!event || event.target.id === 'eggModal' || event.target.classList.contains('egg-close')) {
+                document.getElementById('eggModal').classList.remove('active');
+            }
+        }
+    </script>
+</body>
+
+</html>

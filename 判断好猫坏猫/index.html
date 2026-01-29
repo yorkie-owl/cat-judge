@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1-BIT CAT JUDGE | 1-位猫咪审判台</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000;
+            --fg: #fff;
+            --border-width: 2px;
+            --grid-size: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: crosshair;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--fg);
+            font-family: 'Space Mono', 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 1-Bit Scanline Effect */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(0deg,
+                    rgba(0, 0, 0, 0.2),
+                    rgba(0, 0, 0, 0.2) 1px,
+                    transparent 1px,
+                    transparent 2px);
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0.3;
+        }
+
+        /* Container & Layout */
+        .container {
+            width: 100%;
+            max-width: 800px;
+            border: var(--border-width) solid var(--fg);
+            padding: 20px;
+            position: relative;
+            background: var(--bg);
+        }
+
+        /* Header Section */
+        header {
+            border-bottom: var(--border-width) solid var(--fg);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: -2px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            text-transform: uppercase;
+        }
+
+        .stats-bar {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .stats-item {
+            padding: 4px 10px;
+            border: 1px solid var(--fg);
+        }
+
+        /* Device Modules Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .module {
+            border: var(--border-width) solid var(--fg);
+            padding: 20px;
+            position: relative;
+        }
+
+        .module-header {
+            position: absolute;
+            top: -12px;
+            left: 10px;
+            background: var(--bg);
+            padding: 0 5px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Action Areas */
+        .upload-zone {
+            height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed var(--fg);
+            transition: background 0.2s;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        .btn {
+            background: var(--bg);
+            color: var(--fg);
+            border: var(--border-width) solid var(--fg);
+            padding: 10px 20px;
+            font-family: inherit;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: var(--fg);
+            color: var(--bg);
+        }
+
+        .btn-large {
+            width: 100%;
+            font-size: 1.2rem;
+            padding: 15px;
+            margin-top: 30px;
+        }
+
+        /* Camera & Preview */
+        .camera-container,
+        .preview-container {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: #111;
+            border: 1px solid var(--fg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #video,
+        #preview-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Loading / Analysis */
+        .loading-module {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .loading-module.active {
+            display: block;
+        }
+
+        .loader {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            animation: blink 0.5s infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .progress-container {
+            height: 30px;
+            border: var(--border-width) solid var(--fg);
+            position: relative;
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--fg);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* Results Section */
+        .results-section {
+            display: none;
+        }
+
+        .results-section.active {
+            display: block;
+        }
+
+        .verdict-header {
+            background: var(--fg);
+            color: var(--bg);
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .verdict-header h2 {
+            font-size: 3rem;
+            margin-bottom: 5px;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .score-item {
+            border: 1px solid var(--fg);
+            padding: 15px;
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .score-value-container {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .score-num {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .evidence-module {
+            margin-bottom: 30px;
+        }
+
+        .evidence-list {
+            list-style: none;
+            margin-top: 15px;
+        }
+
+        .evidence-list li {
+            padding: 8px 0;
+            border-bottom: 1px dotted var(--fg);
+            font-size: 0.9rem;
+        }
+
+        .evidence-list li::before {
+            content: "> ";
+        }
+
+        .sentence-box {
+            border: var(--border-width) solid var(--fg);
+            padding: 20px;
+            background: var(--bg);
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        /* Utilities */
+        .hidden {
+            display: none !important;
+        }
+
+        .ascii-art {
+            white-space: pre;
+            font-family: monospace;
+            font-size: 8px;
+            line-height: 1.2;
+            margin-bottom: 10px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <header>
+            <div class="ascii-art">
+                _ _ ____ _____ _______
+                | | | | | _ \|_ _|__ __|
+                | |__| |___| |_) | | | | |
+                | __ |___| _ < | | | | | | | | | |_) |_| |_ | | |_| |_| |____/|_____| |_| </div>
+                    <h1>1-位猫咪审判台</h1>
+                    <p class="subtitle">系统型号: CAT-EYE-v1.0 // 判决芯片-ING01</p>
+                    <div class="stats-bar">
+                        <span class="stats-item">系统状态: 运行中</span>
+                        <span class="stats-item">已审判: <span id="judgedCount">0</span></span>
+                    </div>
+        </header>
+
+        <!-- Step 1: Input -->
+        <div id="input-section" class="modules-grid">
+            <div class="module">
+                <div class="module-header">图像输入.raw</div>
+                <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">[📁]</div>
+                    <p>拖拽图片至此<br>或点击上传罪证</p>
+                </div>
+                <input type="file" id="file-input" class="hidden" accept="image/*" onchange="handleFileSelect(event)">
+            </div>
+            <div class="module">
+                <div class="module-header">实时监控.bin</div>
+                <div id="camera-placeholder"
+                    style="height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="font-size: 3rem; margin-bottom: 10px;">[📷]</div>
+                    <button class="btn" onclick="startCamera()">初始化摄像头</button>
+                </div>
+                <div id="camera-active" class="hidden">
+                    <div class="camera-container">
+                        <video id="video" autoplay playsinline muted></video>
+                    </div>
+                    <button class="btn" style="width: 100%;" onclick="capturePhoto()">现场抓拍</button>
+                    <button class="btn" style="width: 100%; border:none; font-size: 0.7rem;"
+                        onclick="stopCamera()">[终止预览]</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1b: Preview & confirm -->
+        <div id="preview-section" class="module hidden" style="margin-top:20px;">
+            <div class="module-header">捕获确认</div>
+            <div class="preview-container">
+                <img id="preview-img" src="" alt="Cat Preview">
+                <div
+                    style="position:absolute; bottom:10px; right:10px; background:var(--bg); padding:5px; border:1px solid var(--fg); font-size:0.6rem;">
+                    就绪_等待判决</div>
+            </div>
+            <button class="btn btn-large" onclick="analyzeCat()">执行审判程序</button>
+            <button class="btn" style="width: 100%; border:none;" onclick="reset()">[撤回罪证]</button>
+        </div>
+
+        <!-- Step 2: Loading / Analysis -->
+        <div id="loading-section" class="module loading-module">
+            <div class="module-header">核心数据分析中</div>
+            <div class="loader">[[[ 正在扫描 ]]]</div>
+            <div id="loading-text" style="font-size: 0.8rem; margin-bottom: 20px;">获取生物特征中...</div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- Step 3: Results -->
+        <div id="results-section" class="results-section">
+            <div class="verdict-header">
+                <div id="verdict-ascii"
+                    style="font-family: monospace; white-space: pre; font-size: 10px; margin-bottom: 10px;"></div>
+                <h2 id="verdict-title">标题</h2>
+                <p id="verdict-subtitle">副标题</p>
+            </div>
+
+            <div class="scores-grid" id="scores-grid">
+                <!-- Populated via JS -->
+            </div>
+
+            <div class="module evidence-module" id="evidence-module">
+                <div class="module-header">犯罪日志.txt</div>
+                <ul class="evidence-list" id="evidence-list">
+                    <!-- Populated via JS -->
+                </ul>
+            </div>
+
+            <div class="module">
+                <div class="module-header">最终判决书</div>
+                <div class="sentence-box" id="sentence-text">
+                    正在生成判决内容...
+                </div>
+            </div>
+
+            <div class="module" style="margin-bottom: 30px;">
+                <div class="module-header">科普知识库</div>
+                <p id="fun-fact" style="font-size: 0.8rem; line-height: 1.4;"></p>
+            </div>
+
+            <button class="btn btn-large" onclick="reset()">审判下一位目标</button>
+        </div>
+
+        <canvas id="canvas" class="hidden"></canvas>
+    </div>
+
+    <footer>
+        &copy; 1-位审判系统 v1.0.42 // 所有猫咪均受法律约束
+    </footer>
+
+    <script>
+        // --- State ---
+        let currentImage = null;
+        let stream = null;
+        let judgedCount = parseInt(localStorage.getItem('judgedCount_1bit') || '0');
+
+        document.getElementById('judgedCount').textContent = judgedCount;
+
+        // --- Core Data (Replicated from original) ---
+        const dimensions = [
+            { id: 'destruction', name: '破坏指数', icon: '[💥]', desc: '家具受损程度监测' },
+            { id: 'innocence', name: '无辜指数', icon: '[🥺]', desc: '绿茶/卖萌眼神强度' },
+            { id: 'rebellion', name: '叛逆指数', icon: '[😈]', desc: '违抗人类指令频率' },
+            { id: 'nightActivity', name: '夜猫子指数', icon: '[🌙]', desc: '凌晨三点跑酷统计' },
+            { id: 'attitude', name: '社交态度', icon: '[😒]', desc: '高冷/鄙视人类程度' },
+            { id: 'foodTheft', name: '偷食概率', icon: '[🍗]', desc: '餐桌食物失踪风险' }
+        ];
+
+        const crimes = [
+            'LEVEL 3 NOISE POLLUTION (03:00 AM) 🏃',
+            'GRAVITY TESTER: WATER CUP DISPLACED 💧',
+            'PROPERTY DAMAGE: SOFA FABRIC BREACHED 🛋️',
+            'UNAUTHORIZED MEAL CONSUMPTION 🍗',
+            'ITEM EJECTION FROM ELEVATED SURFACE 📦',
+            'ILLEGAL TERRITORY OCCUPATION (LAP/KEYBOARD) 🛏️',
+            'ACTIVE IGNORANCE OF DIRECT CALLS 🙉',
+            'LITTER BOX PROTOCOL BREACHED 💩',
+            'CRITICAL INFRASTRUCTURE DAMAGE (CABLES) 🔌',
+            'TEXTILE CONTAMINATION (CAT HAIR BIOMARKER) 👔',
+            'KEYBOARD INTERFERENCE DURING OPS ⌨️',
+            'TACTICAL BLOCKING OF TRANSPORT PORTALS 🚪'
+        ];
+
+        const verdicts = {
+            good: {
+                title: "绝世好猫",
+                subtitle: "目标状态: 天使级特工",
+                ascii: "  (\\__/)\n  (='.'=)\n  (\")_(\")",
+                sentences: [
+                    "审判结果：行为极其端正。建议奖励顶级罐头。🏆",
+                    "未发现犯罪记录。目标是猫界楷模。🌟",
+                    "扫描显示灵魂纯净度100%。建议无限次撸猫。📜"
+                ]
+            },
+            bad: {
+                title: "法外狂猫",
+                subtitle: "目标状态: 混乱制造者",
+                ascii: "  /\\_/\\\n ( > . < )\n  )   (  \n /     \\",
+                sentences: [
+                    "审判结果：检测到混乱核心。建议立即进行爱的教育。⚠️",
+                    "罪证确凿。即刻没收今晚的小零食。🚫",
+                    "惯犯确认。晚上记得锁好房门。😈"
+                ]
+            },
+            mystery: {
+                title: "量子猫咪",
+                subtitle: "目标状态: 薛定谔的不确定性",
+                ascii: "  /\\_/\\\n ( ? . ? )\n  )   (  \n /     \\",
+                sentences: [
+                    "审判结果：检测到薛定谔属性。行为模式无法预测。🔮",
+                    "双重猫格。请谨慎接触。🎭",
+                    "目标正在演戏。发现奥斯卡级别的伪装。🏆"
+                ]
+            },
+            social: {
+                title: "社交达猫",
+                subtitle: "目标状态: 友谊大使 / 社牛天花板",
+                ascii: "  /\\_/\\\n ( ^ . ^ )\n  )   (  \n /     \\",
+                sentences: [
+                    "审判结果：检测到极高社交能量。它甚至想跟审判员击掌。🤝",
+                    "性格满分。建议带去参加猫咪派对。🥳",
+                    "它不是在求撸，就是在去求撸的路上。💖"
+                ]
+            },
+            lazy: {
+                title: "猪猪猫",
+                subtitle: "目标状态: 液体填充状态 / 橘势大好",
+                ascii: "   _ _\n  (o o)\n (  V  )\n  -- --",
+                sentences: [
+                    "审判结果：生命活动仅剩进食与呼吸。建议增加运动量。🏃",
+                    "检测到极高热量。它正在试图就地液化。🍮",
+                    "这已经不是猫了，这是一个会打呼噜的毛绒枕头。🛋️"
+                ]
+            },
+            wild: {
+                title: "荒野猎手",
+                subtitle: "目标状态: 拆迁办主任 / 跑酷之神",
+                ascii: "  /\\_/\\\n ( * . * )\n  )   (  \n /     \\",
+                sentences: [
+                    "审判结果：体内封印着哈士奇的灵魂。建议加固窗帘。⚡",
+                    "检测到爆炸性输出。它正在筹划下一次跑酷。🏃",
+                    "家里没有任何物体是安全的。祝你好运。💥"
+                ]
+            },
+            thinker: {
+                title: "猫中哲学家",
+                subtitle: "目标状态: 禅修大师 / 发呆专家",
+                ascii: "  /\\_/\\\n ( - . - )\n  )   (  \n /     \\",
+                sentences: [
+                    "审判结果：它正在思考宇宙的终极真理（或者是墙壁上的裂缝）。🤔",
+                    "静默频率过高。它可能已经看穿了你的灵魂。👁️",
+                    "它不是在发呆，它是在跟高纬度文明进行量子通信。🔯"
+                ]
+            }
+        };
+
+        const facts = [
+            '凌晨三点跑酷是刻在DNA里的夜行狩猎模拟协议。 🧬',
+            '推翻物品通常是为了校准环境的重力参数。 🔬',
+            '磨爪是领地标记与硬件(爪子)维护的必要流程。 🛋️',
+            '高冷是因为猫认为人类是缺乏狩猎能力的巨型残障猫。 🐱',
+            '猫无法感知甜味化合物。 🍬',
+            '占领键盘是为了同时获取热能与人类的关注。 ⌨️',
+            '缓慢眨眼是猫界的高级示爱通讯协议。 😻',
+            '呼噜声能触发组织修复并增强骨骼强度。 💚'
+        ];
+
+        const loadingSteps = [
+            "正在解码视觉输入...",
+            "正在提取猫咪生物特征...",
+            "正在计算破坏系数...",
+            "正在检索全网犯罪数据库...",
+            "正在评估伪装/卖萌强度...",
+            "正在咨询目击证人 (家里的狗)...",
+            "正在生成最终判决书..."
+        ];
+
+        // --- Functions ---
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) handleFile(file);
+        }
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) return alert('错误: 文件格式非法');
+            const reader = new FileReader();
+            reader.onload = (e) => showPreview(e.target.result);
+            reader.readAsDataURL(file);
+        }
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                document.getElementById('camera-placeholder').classList.add('hidden');
+                document.getElementById('camera-active').classList.remove('hidden');
+            } catch (err) {
+                alert('错误: 无法开启视觉传感器 (摄像头)');
+            }
+        }
+
+        function stopCamera() {
+            if (stream) stream.getTracks().forEach(t => t.stop());
+            document.getElementById('camera-placeholder').classList.remove('hidden');
+            document.getElementById('camera-active').classList.add('hidden');
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            showPreview(canvas.toDataURL('image/jpeg'));
+            stopCamera();
+        }
+
+        function showPreview(src) {
+            currentImage = src;
+            document.getElementById('input-section').classList.add('hidden');
+            document.getElementById('preview-section').classList.remove('hidden');
+            document.getElementById('preview-img').src = src;
+        }
+
+        function analyzeCat() {
+            document.getElementById('preview-section').classList.add('hidden');
+            document.getElementById('loading-section').classList.add('active');
+
+            let progress = 0;
+            const bar = document.getElementById('progress-bar');
+            const text = document.getElementById('loading-text');
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 8;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(showResult, 500);
+                }
+                bar.style.width = progress + '%';
+
+                // Update text based on progress
+                const stepIdx = Math.floor((progress / 100) * loadingSteps.length);
+                if (loadingSteps[stepIdx]) text.textContent = loadingSteps[stepIdx];
+            }, 250);
+        }
+
+        function showResult() {
+            document.getElementById('loading-section').classList.remove('active');
+            document.getElementById('results-section').classList.add('active');
+
+            // Logic: Random scores (replicated)
+            const scores = {};
+            let sum = 0;
+            dimensions.forEach(d => {
+                scores[d.id] = Math.floor(Math.random() * 100) + 1;
+                sum += scores[d.id];
+            });
+            const avg = sum / dimensions.length;
+
+            // Verdict selection logic
+            let type = 'mystery';
+
+            // New logic for more categories
+            if (scores.attitude >= 75 && scores.innocence >= 60) {
+                type = 'social';
+            } else if (scores.destruction >= 75 && scores.nightActivity >= 70) {
+                type = 'wild';
+            } else if (avg <= 40 && scores.foodTheft >= 70) {
+                type = 'lazy';
+            } else if (scores.attitude >= 60 && scores.nightActivity <= 30) {
+                type = 'thinker';
+            } else if (avg >= 70) {
+                type = 'good';
+            } else if (avg <= 45) {
+                type = 'bad';
+            }
+
+            const v = verdicts[type];
+            document.getElementById('verdict-title').textContent = v.title;
+            document.getElementById('verdict-subtitle').textContent = v.subtitle;
+            document.getElementById('verdict-ascii').textContent = v.ascii;
+
+            // Populate scores
+            const grid = document.getElementById('scores-grid');
+            grid.innerHTML = '';
+            dimensions.forEach(d => {
+                const item = document.createElement('div');
+                item.className = 'score-item';
+                item.innerHTML = `
+                    <div class="score-label">${d.name}</div>
+                    <div class="score-value-container">
+                        <span style="font-size:1.2rem;">${d.icon}</span>
+                        <span class="score-num">${scores[d.id]}</span>
+                        <span style="font-size:0.6rem; opacity:0.5;">/100</span>
+                    </div>
+                    <div style="font-size:0.6rem; margin-top:5px; opacity:0.7;">${d.desc}</div>
+                `;
+                grid.appendChild(item);
+            });
+
+            // Evidence
+            const elist = document.getElementById('evidence-list');
+            elist.innerHTML = '';
+            if (type === 'bad' || Math.random() > 0.5) {
+                document.getElementById('evidence-module').style.display = 'block';
+                const count = type === 'bad' ? 4 : 2;
+                const selected = crimes.sort(() => 0.5 - Math.random()).slice(0, count);
+                selected.forEach(c => {
+                    const li = document.createElement('li');
+                    li.textContent = c;
+                    elist.appendChild(li);
+                });
+            } else {
+                document.getElementById('evidence-module').style.display = 'none';
+            }
+
+            // Sentence & Fact
+            document.getElementById('sentence-text').textContent = v.sentences[Math.floor(Math.random() * v.sentences.length)];
+            document.getElementById('fun-fact').textContent = "数据提示: " + facts[Math.floor(Math.random() * facts.length)];
+
+            // Persistence
+            judgedCount++;
+            localStorage.setItem('judgedCount_1bit', judgedCount);
+            document.getElementById('judgedCount').textContent = judgedCount;
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function reset() {
+            currentImage = null;
+            document.getElementById('results-section').classList.remove('active');
+            document.getElementById('preview-section').classList.add('hidden');
+            document.getElementById('input-section').classList.remove('hidden');
+            document.getElementById('progress-bar').style.width = '0%';
+            document.getElementById('file-input').value = '';
+        }
+
+        // Drag & Drop
+        const dz = document.getElementById('drop-zone');
+        dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+        dz.addEventListener('dragleave', () => dz.classList.remove('dragover'));
+        dz.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dz.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+    </script>
+</body>
+
+</html>
